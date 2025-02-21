@@ -9,6 +9,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = LoginController();
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Container(
@@ -17,8 +18,8 @@ class LoginView extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).colorScheme.primary.withAlpha(204),
-              Theme.of(context).colorScheme.primaryContainer.withAlpha(77),
+              colorScheme.primary.withAlpha(204),
+              colorScheme.primaryContainer.withAlpha(77),
             ],
           ),
         ),
@@ -29,7 +30,7 @@ class LoginView extends StatelessWidget {
                 padding: const EdgeInsets.all(24.0),
                 child: Card(
                   elevation: 8,
-                  color: Theme.of(context).colorScheme.surface,
+                  color: colorScheme.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -43,7 +44,7 @@ class LoginView extends StatelessWidget {
                           Icon(
                             Icons.account_circle,
                             size: 80,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: colorScheme.primary,
                           ),
                           const SizedBox(height: 24),
                           Text(
@@ -51,7 +52,7 @@ class LoginView extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -61,13 +62,13 @@ class LoginView extends StatelessWidget {
                               labelText: 'Email',
                               prefixIcon: Icon(
                                 Icons.email_outlined,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: colorScheme.primary,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Theme.of(context).colorScheme.surfaceContainerHigh.withAlpha(128),
+                              fillColor: colorScheme.surfaceContainerHigh.withAlpha(128),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -83,13 +84,13 @@ class LoginView extends StatelessWidget {
                               labelText: 'Password',
                               prefixIcon: Icon(
                                 Icons.lock_outline,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: colorScheme.primary,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                              fillColor: colorScheme.surfaceContainerHigh.withAlpha(128),
                             ),
                             obscureText: true,
                             validator: (value) {
@@ -109,14 +110,14 @@ class LoginView extends StatelessWidget {
                                 child: controller.isLoading
                                     ? Center(
                                         child: CircularProgressIndicator(
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: colorScheme.primary,
                                         ),
                                       )
                                     : ElevatedButton(
                                         onPressed: () => controller.handleLogin(context),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Theme.of(context).colorScheme.primary,
-                                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                          backgroundColor: colorScheme.primary,
+                                          foregroundColor: colorScheme.onPrimary,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(12),
                                           ),
@@ -138,7 +139,7 @@ class LoginView extends StatelessWidget {
                               // TODO: Implement forgot password
                             },
                             style: TextButton.styleFrom(
-                              foregroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: colorScheme.primary,
                             ),
                             child: const Text('Forgot Password?'),
                           ),

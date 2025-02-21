@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../sample_feature/sample_item_list_view.dart';
+import '../home/home_view.dart';
 
 class LoginController extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
@@ -17,14 +17,13 @@ class LoginController extends ChangeNotifier {
     if (!formKey.currentState!.validate()) return;
 
     isLoading = true;
-
     await Future.delayed(const Duration(seconds: 1));
-
     isLoading = false;
 
     if (context.mounted) {
-      Navigator.of(context).pushReplacementNamed(
-        SampleItemListView.routeName,
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        HomeView.routeName,
+        (route) => false,
       );
     }
   }
