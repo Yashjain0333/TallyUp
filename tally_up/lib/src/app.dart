@@ -29,23 +29,18 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    getPermission().then((value) {
+    getPermission().then((value) async {
       print("SMS Permission status: $value");
       if (value) {
-        print("Starting SMS listener...");
-        SmsReaderPlugin().smsStream().listen(
-          (event) {
-            print("SMS Received: ${event.message} from ${event.sender}");
-            MessagesController().addMessage(Message(
-              content: event.message,
-              time: event.date,
-              sender: event.sender,
-            ));
-          },
-          onError: (error) {
-            print("SMS Stream error: $error");
-          },
-        );
+        final messages = await SmsReaderPlugin().readMonthSMS();
+        for (var msg in messages) {
+          MessagesController().addMessage(Message(
+            content: msg.message,
+            time: msg.date,
+            sender: msg.sender,
+            type: MessageType.uncategorized,
+          ));
+        }
       }
     });
   }

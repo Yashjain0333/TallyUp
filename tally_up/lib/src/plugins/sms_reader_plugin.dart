@@ -1,16 +1,16 @@
 import 'package:flutter/services.dart';
 
 class SmsReaderPlugin {
-  static const _eventChannel = EventChannel('com.example.tally_up/smsStream');
+  static const _methodChannel = MethodChannel('com.example.tally_up/sms');
   
-  Stream<SmsMessage> smsStream() {
-    print("Starting SMS stream...");
-    return _eventChannel
-        .receiveBroadcastStream()
-        .map((dynamic event) {
-          print("Raw SMS event received: $event");
-          return SmsMessage.fromMap(Map<String, dynamic>.from(event));
-        });
+  Future<List<SmsMessage>> readMonthSMS() async {
+    try {
+      final List<dynamic> messages = await _methodChannel.invokeMethod('readMonthSMS');
+      return messages.map((msg) => SmsMessage.fromMap(Map<String, dynamic>.from(msg))).toList();
+    } catch (e) {
+      print("Error reading SMS: $e");
+      return [];
+    }
   }
 }
 
