@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../messages/messages_view.dart';
 
 class HomeView extends StatelessWidget {
   static const routeName = '/home';
@@ -183,14 +184,19 @@ class HomeView extends StatelessWidget {
         ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
+          currentIndex: 0,
+          onTap: (index) {
+            if (index == 1) {
+              Navigator.pushNamed(context, MessagesView.routeName);
+            }
+          },
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.wallet), label: 'Wallet'),
+            BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'), // Updated icon and label
             BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Add'),
             BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Stats'),
             BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
-          currentIndex: 0,
         ),
       );
   }
