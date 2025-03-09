@@ -5,16 +5,19 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from api.routes.users import user_router
+from api.routes.xpense import xpense_router
+
 
 # Uncomment to connect MongoDB before startup
 @asynccontextmanager
-async def _lifespan(app:FastAPI):
+async def _lifespan(app: FastAPI):
     # app.mongodb_client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
     # app.mongodb = app.mongodb_client[os.getenv("MONGO_DB", "mobile_app")]
     # print("Connected to MongoDB")
     yield
     # app.mongodb_client.close()
     # print("MongoDB connection closed")
+
 
 app = FastAPI(
     title="TallyUp Backend API",
@@ -32,11 +35,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(user_router,prefix='/user',tags=['User'])
+app.include_router(user_router, prefix="/user", tags=["User"])
+app.include_router(xpense_router, prefix="/xpense", tags=["Expense"])
+
 
 @app.get("/health", status_code=status.HTTP_200_OK)
 def health_check():
     return {"status": "healthy"}
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

@@ -13,14 +13,14 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 # RUN pip install --no-cache-dir -r requirements.txt # production me isse uncomment kar dena
 
-# entrypoint 
-COPY docker/api/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# # entrypoint 
+# COPY docker/api/entrypoint.sh /entrypoint.sh
+# RUN chmod +x /entrypoint.sh
 
 # Copy app
 COPY app /app
 
 EXPOSE 8000
 
-ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
