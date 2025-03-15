@@ -14,4 +14,4 @@
 
 
 
-{"content": "736789 is OTP for txn of INR 1000.00 at PAYZAPP WALLET on ECOM on card ending 2939 .Valid till 5 minutes .Do not share OTP with anyone -Federal Bank", "time": "1741361056324", "sender": "JM-FEDOTP", "type": "MessageType.uncategorized"}
+{'email': 'randomEmail@example.com', 'sms_payload': {'content': 'Your Amex SafeKey One-Time Password for INR 1,007.50, at NPS is 098639. Valid for 10 mins for Card ending  72005. Do not disclose it to anyone.', 'time': '1740780656293', 'sender': 'VM-MYAMEX', 'type': 'MessageType.uncategorized'}}

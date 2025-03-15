@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Request
 from schemas._xpense import SMS_Payload
 from typing import List, Any, Dict
 
@@ -6,14 +6,14 @@ xpense_router = APIRouter()
 
 
 @xpense_router.post("/xpense")
-async def read_sms(sms_payload: Dict[Any,Any]):
+async def read_sms(sms_payload: Request):
     """_summary_
 
     Args:
         user (UserCreate): _description_
     """
-    print(sms_payload)
-    print(type(sms_payload))
+    print(await sms_payload.json())
+    print(type(await sms_payload.json()))
 
     return 200
 
