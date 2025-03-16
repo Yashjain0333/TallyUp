@@ -1,4 +1,5 @@
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic_core import CoreSchema
+from pydantic import BaseModel, EmailStr, Field, field_validator, GetJsonSchemaHandler
 from typing import Optional, List, Any, Dict
 from datetime import datetime
 import uuid
@@ -18,7 +19,7 @@ class PyObjectId(ObjectId):
         return ObjectId(v)
 
     @classmethod
-    def __modify_schema__(cls, field_schema):
+    def __get_pydantic_json_schema__(cls, field_schema):
         field_schema.update(type="string")
 
 
@@ -31,7 +32,7 @@ class UserCreate(UserBase):
     password: str
     confirm_password: str
     
-    @validator('password')
+    @field_validator('password')
     def password_strength(cls, v):
         # Minimum 8 characters, at least one uppercase, one lowercase, one number
         if len(v) < 8:
@@ -44,7 +45,7 @@ class UserCreate(UserBase):
             raise ValueError('Password must contain at least one number')
         return v
     
-    @validator('confirm_password')
+    @field_validator('confirm_password')
     def passwords_match(cls, v, values, **kwargs):
         if 'password' in values and v != values['password']:
             raise ValueError('Passwords do not match')
@@ -68,7 +69,7 @@ class User(UserBase):
     updated_at: Optional[datetime] = None
     
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {
             ObjectId: str,
@@ -100,7 +101,7 @@ class UserResponse(BaseModel):
     last_login: Optional[datetime] = None
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {
             ObjectId: str,
@@ -123,7 +124,7 @@ class PasswordResetConfirm(BaseModel):
     new_password: str
     confirm_password: str
     
-    @validator('new_password')
+    @field_validator('new_password')
     def password_strength(cls, v):
         # Same validation as UserCreate
         if len(v) < 8:
@@ -136,7 +137,7 @@ class PasswordResetConfirm(BaseModel):
             raise ValueError('Password must contain at least one number')
         return v
     
-    @validator('confirm_password')
+    @field_validator('confirm_password')
     def passwords_match(cls, v, values, **kwargs):
         if 'new_password' in values and v != values['new_password']:
             raise ValueError('Passwords do not match')
@@ -148,7 +149,7 @@ class PasswordChange(BaseModel):
     new_password: str
     confirm_password: str
     
-    @validator('new_password')
+    @field_validator('new_password')
     def password_strength(cls, v):
         # Same validation as UserCreate
         if len(v) < 8:
@@ -161,7 +162,7 @@ class PasswordChange(BaseModel):
             raise ValueError('Password must contain at least one number')
         return v
     
-    @validator('confirm_password')
+    @field_validator('confirm_password')
     def passwords_match(cls, v, values, **kwargs):
         if 'new_password' in values and v != values['new_password']:
             raise ValueError('Passwords do not match')
