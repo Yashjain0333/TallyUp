@@ -4,6 +4,8 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+from config.config import initiate_database, close_database
+
 from api.routes.users import user_router
 from api.routes.xpense import xpense_router
 
@@ -11,12 +13,11 @@ from api.routes.xpense import xpense_router
 # Uncomment to connect MongoDB before startup
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
-    # app.mongodb_client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
-    # app.mongodb = app.mongodb_client[os.getenv("MONGO_DB", "mobile_app")]
-    # print("Connected to MongoDB")
+    await initiate_database()
+    print("Connected to MongoDB")
     yield
-    # app.mongodb_client.close()
-    # print("MongoDB connection closed")
+    await close_database()
+    print("MongoDB connection closed")
 
 
 app = FastAPI(
@@ -25,6 +26,7 @@ app = FastAPI(
     version="0.1.0",
     lifespan=_lifespan,
 )
+
 
 # CORS middleware configuration
 app.add_middleware(
