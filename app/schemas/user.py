@@ -1,17 +1,184 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field, validator
+from typing import Optional, List, Any, Dict
+from datetime import datetime
+import uuid
+from bson import ObjectId
+import re
 
-# User schemas
+# Custom ObjectId field for MongoDB compatibility
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid ObjectId")
+        return ObjectId(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
+
+
 class UserBase(BaseModel):
-    email: str
+    email: EmailStr
     name: str
 
 
 class UserCreate(UserBase):
     password: str
+    confirm_password: str
+    
+    @validator('password')
+    def password_strength(cls, v):
+        # Minimum 8 characters, at least one uppercase, one lowercase, one number
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('Password must contain at least one number')
+        return v
+    
+    @validator('confirm_password')
+    def passwords_match(cls, v, values, **kwargs):
+        if 'password' in values and v != values['password']:
+            raise ValueError('Passwords do not match')
+        return v
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserDelete(BaseModel):
+    user_id: str
+    password: str  # For security confirmation
 
 
 class User(UserBase):
-    id: str
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+    
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {
+            ObjectId: str,
+            datetime: lambda dt: dt.isoformat()
+        }
+
+
+# Token schemas
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    refresh_token: str
+    user_id: str
+    expires_at: datetime
+
+
+class TokenData(BaseModel):
+    user_id: Optional[str] = None
+    token_type: Optional[str] = None
+
+
+# Response schemas
+class UserResponse(BaseModel):
+    id: str = Field(alias="_id")
+    email: str
+    name: str
+    is_active: bool
+    created_at: datetime
+    last_login: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {
+            ObjectId: str,
+            datetime: lambda dt: dt.isoformat()
+        }
+
+
+class MessageResponse(BaseModel):
+    message: str
+    status: Optional[str] = "success"
+
+
+# Password management schemas
+class PasswordReset(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    token: str
+    new_password: str
+    confirm_password: str
+    
+    @validator('new_password')
+    def password_strength(cls, v):
+        # Same validation as UserCreate
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('Password must contain at least one number')
+        return v
+    
+    @validator('confirm_password')
+    def passwords_match(cls, v, values, **kwargs):
+        if 'new_password' in values and v != values['new_password']:
+            raise ValueError('Passwords do not match')
+        return v
+
+
+class PasswordChange(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: str
+    
+    @validator('new_password')
+    def password_strength(cls, v):
+        # Same validation as UserCreate
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('Password must contain at least one number')
+        return v
+    
+    @validator('confirm_password')
+    def passwords_match(cls, v, values, **kwargs):
+        if 'new_password' in values and v != values['new_password']:
+            raise ValueError('Passwords do not match')
+        return v
+
+
+# RefreshToken schema
+class RefreshToken(BaseModel):
+    refresh_token: str
+
+
+# MongoDB document schema (helper for DB operations)
+class UserInDB(User):
+    hashed_password: str
+    reset_token: Optional[str] = None
+    reset_token_expires: Optional[datetime] = None
+    refresh_tokens: List[Dict[str, Any]] = Field(default_factory=list)
+    last_login: Optional[datetime] = None
+    failed_login_attempts: int = 0
+    locked_until: Optional[datetime] = None
