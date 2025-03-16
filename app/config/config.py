@@ -8,6 +8,7 @@ import models.user
 
 client = None
 
+
 class Settings(BaseSettings):
     DATABASE_URL: Optional[str] = None
     MONGO_INITDB_DATABASE: Optional[str] = None
@@ -26,10 +27,13 @@ class Settings(BaseSettings):
 
 
 async def initiate_database():
+    global client
     client = AsyncIOMotorClient(Settings().DATABASE_URL)
     await init_beanie(
-        database=client.get_database(Settings().MONGO_INITDB_DATABASE), document_models=models.__all__, 
+        database=client.get_database(Settings().MONGO_INITDB_DATABASE),
+        document_models=models.__all__,
     )
+
 
 async def close_database():
     if client:
