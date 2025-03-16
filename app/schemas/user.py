@@ -7,7 +7,7 @@ from bson import ObjectId
 import re
 
 # Custom ObjectId field for MongoDB compatibility
-class PyObjectId(ObjectId):
+class PyObjectId(BaseModel):
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -19,8 +19,13 @@ class PyObjectId(ObjectId):
         return ObjectId(v)
 
     @classmethod
-    def __get_pydantic_json_schema__(cls, field_schema):
-        field_schema.update(type="string")
+    def __get_pydantic_json_schema__(
+        cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
+    ) -> dict[str, Any]:
+        json_schema = super().__get_pydantic_json_schema__(core_schema, handler)
+        json_schema = handler.resolve_ref_schema(json_schema)
+        json_schema.update(examples=['example'])
+        return json_schema
 
 
 class UserBase(BaseModel):
