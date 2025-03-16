@@ -14,7 +14,7 @@ from config.config import settings
 
 auth_router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
@@ -39,7 +39,6 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
     try:
-        print(form_data)
         ## FOR Vinayak : Implement Add User to DB Here
         # user = authenticate_user(fake_users_db, form_data.username, form_data.password)
 
