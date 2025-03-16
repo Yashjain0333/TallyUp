@@ -1,6 +1,8 @@
+"""Main Module for FastAPI Server
+"""
 import uvicorn
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
@@ -8,6 +10,7 @@ from database.database import initiate_database, close_database
 
 from api.routes.users import user_router
 from api.routes.xpense import xpense_router
+from api.routes.auth import auth_router
 
 
 # Uncomment to connect MongoDB before startup
@@ -36,6 +39,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix="/auth", tags=["User"])
 app.include_router(user_router, prefix="/user", tags=["User"])
 app.include_router(xpense_router, prefix="/xpense", tags=["Expense"])
 

@@ -1,8 +1,7 @@
 from pydantic_core import CoreSchema
 from pydantic import BaseModel, EmailStr, Field, field_validator, GetJsonSchemaHandler
-from typing import Optional, List, Any, Dict
+from typing import Optional, Any, List, Dict
 from datetime import datetime
-import uuid
 from bson import ObjectId
 import re
 
@@ -81,20 +80,15 @@ class User(UserBase):
             datetime: lambda dt: dt.isoformat()
         }
 
-
-# Token schemas
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    refresh_token: str
-    user_id: str
-    expires_at: datetime
-
-
-class TokenData(BaseModel):
-    user_id: Optional[str] = None
-    token_type: Optional[str] = None
-
+# MongoDB document schema (helper for DB operations)
+class UserInDB(User):
+    hashed_password: str
+    reset_token: Optional[str] = None
+    reset_token_expires: Optional[datetime] = None
+    refresh_tokens: List[Dict[str, Any]] = Field(default_factory=list)
+    last_login: Optional[datetime] = None
+    failed_login_attempts: int = 0
+    locked_until: Optional[datetime] = None
 
 # Response schemas
 class UserResponse(BaseModel):
@@ -173,18 +167,3 @@ class PasswordChange(BaseModel):
             raise ValueError('Passwords do not match')
         return v
 
-
-# RefreshToken schema
-class RefreshToken(BaseModel):
-    refresh_token: str
-
-
-# MongoDB document schema (helper for DB operations)
-class UserInDB(User):
-    hashed_password: str
-    reset_token: Optional[str] = None
-    reset_token_expires: Optional[datetime] = None
-    refresh_tokens: List[Dict[str, Any]] = Field(default_factory=list)
-    last_login: Optional[datetime] = None
-    failed_login_attempts: int = 0
-    locked_until: Optional[datetime] = None

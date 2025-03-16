@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from schemas.user import User, UserCreate, UserBase
+from schemas._user import User, UserCreate
 from typing import List
 
 user_router = APIRouter()

@@ -1,5 +1,6 @@
-from typing import Optional
+"""Pydantic Settings module for FastAPI App"""
 
+from typing import Optional
 from pydantic_settings import BaseSettings
 
 
