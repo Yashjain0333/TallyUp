@@ -4,7 +4,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-from config.config import initiate_database, close_database
+from database.database import initiate_database, close_database
 
 from api.routes.users import user_router
 from api.routes.xpense import xpense_router
