@@ -1,26 +1,30 @@
-"""Main Module for FastAPI Server
-"""
-import uvicorn
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, status
-from fastapi.middleware.cors import CORSMiddleware
-import os
+"""Main Module for FastAPI Server"""
 
+import os
+import logging
+from contextlib import asynccontextmanager
+import uvicorn
+from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
+
+from middlewares.single_quote_parser import SingleQuoteJSONMiddleware
 from database.database import initiate_database, close_database
 
 from api.routes.users import user_router
 from api.routes.xpense import xpense_router
 from api.routes.auth import auth_router
 
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: \t  %(message)s")
+logger = logging.getLogger("main")
 
-# Uncomment to connect MongoDB before startup
+
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
     await initiate_database()
-    print("Connected to MongoDB")
+    logger.info("Connected to MongoDB")
     yield
     await close_database()
-    print("MongoDB connection closed")
+    logger.info("MongoDB connection closed")
 
 
 app = FastAPI(
@@ -30,7 +34,7 @@ app = FastAPI(
     lifespan=_lifespan,
 )
 
-# CORS middleware configuration
+app.add_middleware(SingleQuoteJSONMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(","),

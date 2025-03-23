@@ -6,14 +6,14 @@ xpense_router = APIRouter()
 
 
 @xpense_router.post("/xpense")
-async def read_sms(sms_payload: Request):
+async def read_sms(sms_payload: SMS_Payload):
     """_summary_
 
     Args:
         user (UserCreate): _description_
     """
-    print(await sms_payload.json())
-    print(type(await sms_payload.json()))
+    print(sms_payload)
+    # print(type(await sms_payload.json()))
 
     return 200
 
