@@ -15,9 +15,9 @@ class Settings(BaseSettings):
     ALGORITHM: Optional[str] = None
     ACCESS_TOKEN_EXPIRE_MINUTES: Optional[str] = None
     REFRESH_TOKEN_EXPIRE_DAYS: Optional[str] = None
-
+    GOOGLE_API_KEY: Optional[str] = None
     ALLOWED_ORIGINS: Optional[str] = None
-
+    MODEL_ID: Optional[str] = None
     CLIENT_ORIGIN: Optional[str] = None
 
     class Config:

@@ -3,9 +3,10 @@
 from datetime import timedelta
 from typing import Annotated
 from fastapi import Depends, APIRouter, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 
+from api.dependencies import oauth2_scheme,credentials_exception
 from schemas._user import User, UserCreate
 from schemas._auth import Token, TokenData
 from utils.encryption_utils import create_access_token, is_token_valid
@@ -14,12 +15,6 @@ from config.config import settings
 
 auth_router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
-credentials_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
 
 #! Remove this
 user = User(
@@ -99,7 +94,7 @@ async def login_for_access_token(
 
 
 @auth_router.get("/users/me/")
-async def get_current_user(token: Annotated[User, Depends(oauth2_scheme)]):
+async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         _itv, payload = is_token_valid(token)
         if not _itv:
@@ -121,9 +116,3 @@ async def get_current_user(token: Annotated[User, Depends(oauth2_scheme)]):
 
     except InvalidTokenError as e:
         raise credentials_exception from e
-
-
-# async def read_users_me(
-#     current_user: Annotated[User, Depends(get_current_user)],
-# ):
-#     return current_user
