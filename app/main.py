@@ -10,7 +10,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from middlewares.single_quote_parser import SingleQuoteJSONMiddleware
 from database.database import initiate_database, close_database
 
-from api.routes.users import user_router
 from api.routes.xpense import xpense_router
 from api.routes.auth import auth_router
 
@@ -44,7 +43,6 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix="/auth", tags=["User"])
-app.include_router(user_router, prefix="/user", tags=["User"])
 app.include_router(xpense_router, prefix="/xpense", tags=["Expense"])
 
 

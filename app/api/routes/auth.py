@@ -6,7 +6,7 @@ from fastapi import Depends, APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
-from schemas._user import User
+from schemas._user import User, UserCreate
 from schemas._auth import Token, TokenData
 from utils.encryption_utils import create_access_token, is_token_valid
 
@@ -33,6 +33,41 @@ user = User(
     }
 )
 
+@auth_router.post("/signup", response_model=User)
+async def signup_user(user_data: UserCreate):
+    try:
+        ## FOR Vinayak : Check if user already exists
+        # This would be implemented with your database
+        # existing_user = get_user_by_email(user_data.email)
+        # if existing_user:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         detail="User with this email already exists",
+        #     )
+        
+        # Hash the password before storing
+        # user_data.password = get_password_hash(user_data.password)
+        
+        # Store the user in the database
+        # new_user = create_user_in_db(user_data)
+        
+        # For now, just return the user data without the password
+        # In a real implementation, you would return the new_user from the database
+        user_response = User(
+            email=user_data.email,
+            name=user_data.name,
+            # phone_number=user_data.phone_number,
+            is_active=True,
+        )
+        
+        return user_response
+        
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error creating user. Please contact admin.",
+        ) from e
 
 @auth_router.post("/token")
 async def login_for_access_token(
@@ -48,7 +83,9 @@ async def login_for_access_token(
                 detail="Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        access_token_expires = timedelta(minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+        access_token_expires = timedelta(
+            minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        )
         access_token = create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )
@@ -61,7 +98,7 @@ async def login_for_access_token(
         ) from e
 
 
-@auth_router.get("/users/me/", response_model=User)
+@auth_router.get("/users/me/")
 async def get_current_user(token: Annotated[User, Depends(oauth2_scheme)]):
     try:
         _itv, payload = is_token_valid(token)

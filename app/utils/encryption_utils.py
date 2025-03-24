@@ -35,7 +35,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
@@ -93,7 +93,7 @@ def is_token_valid(token: str, token_type: str = "access") -> tuple:
     if "exp" not in payload:
         return False
 
-    expiration = datetime.fromtimestamp(payload["exp"])
+    expiration = datetime.fromtimestamp(payload["exp"], tz=timezone.utc)
     if expiration < datetime.now(timezone.utc):
         return False
 

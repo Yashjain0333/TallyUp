@@ -51,7 +51,7 @@ class UserCreate(UserBase):
     
     @field_validator('confirm_password')
     def passwords_match(cls, v, values, **kwargs):
-        if 'password' in values and v != values['password']:
+        if 'password' in values.data and v != values.data['password']:
             raise ValueError('Passwords do not match')
         return v
 
