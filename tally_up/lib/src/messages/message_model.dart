@@ -14,6 +14,15 @@ class Message {
     this.title = '',
     this.type = MessageType.uncategorized,
   });
+
+  Map<String, String> toJson() {
+    return {
+      'content': content,
+      'time': time,
+      'sender': sender,
+      'type': type.toString(),
+    };
+  }
 }
 
 enum MessageType {

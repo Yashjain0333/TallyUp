@@ -1,46 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'message_model.dart';
+import '../config/api_config.dart';
 
 class MessagesController with ChangeNotifier {
   static final MessagesController _instance = MessagesController._internal();
   factory MessagesController() => _instance;
   MessagesController._internal();
   
-  List<Message> messages = [
-    // Message(
-    //   title: 'Payment Received',
-    //   content: 'You received \$500 from John',
-    //   time: '2m ago',
-    //   type: MessageType.payment,
-    // ),
-    // Message(
-    //   title: 'Bill Due',
-    //   content: 'Electricity bill due in 2 days',
-    //   time: '1h ago',
-    //   type: MessageType.bill,
-    // ),
-    // Message(
-    //   title: 'Budget Alert',
-    //   content: 'You\'re close to your food budget',
-    //   time: '3h ago',
-    //   type: MessageType.budget,
-    // ),
-    // Message(
-    //   title: 'Subscription Renewal',
-    //   content: 'Netflix subscription will renew tomorrow',
-    //   time: '5h ago',
-    //   type: MessageType.subscription,
-    // ),
-    // Message(
-    //   title: 'Investment Update',
-    //   content: 'Your stocks are up by 3.2% today',
-    //   time: '8h ago',
-    //   type: MessageType.investment,
-    // ),
-  ];
+  final _apiConfig = ApiConfig();
+  List<Message> messages = [];
 
-  void addMessage(Message message) {
+  Future<void> addMessage(Message message) async {
     messages.add(message);
+    
+    try {
+      final payload = {
+        'email': 'randmEmail@example.com',
+        'sms_payload': message.toJson()
+      };
+
+      final response = await http.post(
+        Uri.parse(_apiConfig.messagesUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        print('Failed to send message to server: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error sending message to server: $e');
+    }
+
     notifyListeners();
   }
 }

@@ -134,14 +134,41 @@ class LoginView extends StatelessWidget {
                             },
                           ),
                           const SizedBox(height: 16),
-                          TextButton(
-                            onPressed: () {
-                              // TODO: Implement forgot password
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: colorScheme.primary,
-                            ),
-                            child: const Text('Forgot Password?'),
+                          // TextButton(
+                          //   onPressed: () {
+                          //     // TODO: Implement forgot password
+                          //   },
+                          //   style: TextButton.styleFrom(
+                          //     foregroundColor: colorScheme.primary,
+                          //   ),
+                          //   child: const Text('Forgot Password?'),
+                          // ),
+                          
+                          // Add signup CTA
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Don\'t have an account?',
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(context, '/signup');
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: colorScheme.primary,
+                                ),
+                                child: const Text(
+                                  'Sign Up',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
